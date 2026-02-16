@@ -1,242 +1,357 @@
 <!doctype html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Review Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Review UI</title>
+
   <style>
     :root{
-      --bg:#f3d7a5;
-      --card:#ffffff;
-      --text:#111;
-      --muted:#6b6b6b;
-      --line:#e9e9e9;
-      --yellow:#f7c600;
-    }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    body{margin:0;background:var(--bg);display:flex;justify-content:center;padding:14px}
-    .phone{
-      width:min(420px, 100%);
-      background:var(--card);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 10px 28px rgba(0,0,0,.12);
-      border:1px solid rgba(0,0,0,.06);
+      --bg: #ffffff;
+      --text: #111111;
+      --muted: #444444;
+
+      --field-border: #bdbdbd;
+      --field-bg: #ffffff;
+
+      --tile-bg: #eef2f4;
+      --tile-border: #cfcfcf;
+
+      --star-fill: #f0a100;     /* orange */
+      --star-stroke: #d07d00;   /* darker outline */
+
+      --btn: #f7c600;           /* Amazon-like yellow */
     }
 
-    /* Top search bar */
-    .top{
-      background:transparent;
-      padding:14px 12px 10px;
+    *{
+      box-sizing: border-box;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
-    .search{
-      display:flex;align-items:center;gap:10px;
-      background:#fff;
-      border-radius:28px;
-      border:1px solid var(--line);
-      padding:10px 12px;
+
+    body{
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
     }
-    .icon{font-size:18px;opacity:.8}
-    .pill{flex:1;color:#888;font-size:15px}
-    .mini{display:flex;gap:10px}
 
-    .content{padding:14px 14px 18px}
+    /* Mobile page width like screenshot */
+    .page{
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 18px 16px 120px; /* bottom space for fixed button */
+      background: #fff;
+    }
 
-    /* Header row */
-    .row{display:flex;gap:12px;align-items:flex-start}
+    /* Product row */
+    .product{
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
     .thumb{
-      width:52px;height:52px;border-radius:10px;border:1px solid var(--line);
-      background:linear-gradient(135deg,#ddd,#f7f7f7);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f3f3f3;
+      flex: 0 0 auto;
     }
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    h1{margin:0;font-size:22px}
-    .subtitle{margin-top:4px;color:#444;font-size:15px}
+    .thumb img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .product h1{
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .product .name{
+      margin-top: 6px;
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.2;
+
+      /* Amazon-like truncate */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100vw - 120px);
+    }
 
     /* Stars */
-    .stars{display:flex;gap:6px;margin:12px 0 14px}
-    .star{
-      width:44px;height:44px;border:none;background:transparent;cursor:pointer;
-      font-size:40px;line-height:1;color:#f0b400; /* default star color */
-      filter: drop-shadow(0 1px 0 rgba(0,0,0,.05));
-      padding:0;
+    .stars{
+      display: flex;
+      gap: 14px;
+      margin: 18px 0 18px;
+      align-items: center;
     }
-    .star.off{color:#ffd88a}
+    .star-btn{
+      width: 54px;
+      height: 54px;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+    .star-btn svg{
+      width: 54px;
+      height: 54px;
+      display: block;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,.08));
+    }
+    .star-btn path{
+      fill: var(--star-fill);
+      stroke: var(--star-stroke);
+      stroke-width: 0.9;
+      stroke-linejoin: round;
+    }
+    .star-btn.off path{
+      fill: #f6cf7b;
+      stroke: #e2b24e;
+      opacity: .55;
+    }
 
-    .section{font-weight:800;margin:10px 0 8px;font-size:18px}
+    /* Section headings */
+    .section{
+      margin: 0;
+      font-size: 30px;    /* big like screenshot */
+      font-weight: 900;
+      letter-spacing: -0.2px;
+    }
+    .section + .block{ margin-top: 10px; }
+
+    /* Inputs */
+    textarea, input[type="text"]{
+      width: 100%;
+      border: 2px solid var(--field-border);
+      border-radius: 18px;
+      background: var(--field-bg);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
+    }
 
     textarea{
-      width:100%;
-      border:1px solid #cfcfcf;
-      border-radius:14px;
-      padding:14px;
-      font-size:16px;
-      min-height:150px;
-      outline:none;
+      padding: 16px;
+      font-size: 22px;
+      line-height: 1.35;
+      min-height: 210px;
+      resize: none;
     }
 
-    .photo-title{font-weight:800;margin:16px 0 10px;font-size:18px}
-    .photos{display:flex;gap:12px;align-items:center}
-    .tile{
-      width:88px;height:88px;border-radius:14px;border:1px solid #d7d7d7;background:#fff;
-      display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
-    }
-    .tile img{width:100%;height:100%;object-fit:cover}
-    .remove{
-      position:absolute;top:6px;left:6px;
-      width:26px;height:26px;border-radius:999px;border:none;
-      background:rgba(255,255,255,.9);
-      font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
-    }
-    .add{
-      font-size:42px;color:#777;cursor:pointer;user-select:none;
-      display:flex;align-items:center;justify-content:center;width:100%;height:100%;
-    }
-
-    .title-row{margin-top:18px}
-    .title-label{font-weight:800;margin-bottom:8px;font-size:18px}
     input[type="text"]{
-      width:100%;
-      border:1px solid #cfcfcf;
-      border-radius:14px;
-      padding:14px;
-      font-size:16px;
-      outline:none;
+      padding: 16px;
+      font-size: 22px;
+      line-height: 1.2;
     }
 
-    .bottom{
-      padding:14px;
-      background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+    /* Photo tiles */
+    .photo-row{
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .tile{
+      width: 108px;
+      height: 108px;
+      border-radius: 20px;
+      border: 2px solid var(--tile-border);
+      background: var(--tile-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .tile img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* X button on TOP-RIGHT like screenshot */
+    .remove{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 0;
+      background: rgba(255,255,255,.95);
+      color: #111;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plus{
+      font-size: 64px;
+      color: #6b6b6b;
+      margin-top: -6px;
+      user-select: none;
+    }
+
+    /* Spacing blocks */
+    .block{ margin-bottom: 22px; }
+    .spacer-sm{ height: 6px; }
+
+    /* Required label */
+    .required{
+      font-size: 18px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    /* Submit fixed bottom like app */
+    .submit-bar{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
     }
     .submit{
-      width:100%;
-      background:var(--yellow);
-      border:none;
-      font-weight:800;
-      font-size:18px;
-      padding:14px 16px;
-      border-radius:999px;
-      cursor:pointer;
-      box-shadow:0 6px 18px rgba(0,0,0,.12);
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      background: var(--btn);
+      color: #111;
+      font-size: 28px;
+      font-weight: 900;
+      padding: 18px 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,.12);
     }
-    .submit:active{transform:scale(.99)}
-    .smallhint{color:var(--muted);font-size:12px;margin-top:8px}
-
-    /* Make it feel like full screen */
-    .spacer{height:8px}
+    .submit:active{ transform: scale(.99); }
   </style>
 </head>
+
 <body>
-  <div class="phone">
-    <div class="top">
-      <div class="search">
-        <div class="icon">←</div>
-        <div class="pill">Search or ask a question</div>
-        <div class="mini">
-          <div class="icon">📷</div>
-          <div class="icon">🎤</div>
-        </div>
+  <main class="page">
+    <div class="product block">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=240&q=60" alt="Product" />
+      </div>
+      <div>
+        <h1>How was the item?</h1>
+        <div class="name">Led Strip Lights for Bedroom Dimmable 20 F…</div>
       </div>
     </div>
 
-    <div class="content">
-      <div class="row">
-        <div class="thumb" id="productThumb">
-          <img alt="product" src="https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=200&q=60">
+    <div class="stars" aria-label="Star rating">
+      <button class="star-btn" data-star="1" aria-label="1 star">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+      <button class="star-btn" data-star="2" aria-label="2 stars">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+      <button class="star-btn" data-star="3" aria-label="3 stars">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+      <button class="star-btn" data-star="4" aria-label="4 stars">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+      <button class="star-btn" data-star="5" aria-label="5 stars">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+    </div>
+
+    <h2 class="section">Write a review</h2>
+    <div class="block">
+      <div class="spacer-sm"></div>
+      <textarea id="reviewText">I like these LED strips for my bedroom because they provide consistent, warm white light, but just a heads up — you can’t change the color. The remote works well to dim or brighten the lights, and the adhesive sticks nicely. They create a cozy atmosphere, just without the colorful effects you might</textarea>
+    </div>
+
+    <h2 class="section">Share a video or photo</h2>
+    <div class="block">
+      <div class="photo-row">
+        <!-- Sample image shown like screenshot (you can remove and add your own) -->
+        <div class="tile" id="photoTile">
+          <button class="remove" id="removeBtn" type="button" aria-label="Remove photo">×</button>
+          <img id="photoPreview"
+               src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=60"
+               alt="Uploaded" />
         </div>
-        <div>
-          <h1>How was the item?</h1>
-          <div class="subtitle">Led Strip Lights for Bedroom Dimmable 20 F…</div>
-        </div>
-      </div>
 
-      <div class="stars" aria-label="Star rating">
-        <button class="star off" data-star="1">★</button>
-        <button class="star off" data-star="2">★</button>
-        <button class="star off" data-star="3">★</button>
-        <button class="star off" data-star="4">★</button>
-        <button class="star off" data-star="5">★</button>
-      </div>
-
-      <div class="section">Write a review</div>
-      <textarea id="reviewText">I like these LED strips for my bedroom because they provide consistent, warm white light, but just a heads up — you can’t change the color. The remote works well to dim or brighten the lights, and the adhesive sticks nicely. They create a cozy atmosphere…</textarea>
-
-      <div class="photo-title">Share a video or photo</div>
-      <div class="photos" id="photos">
-        <div class="tile" id="firstTile" style="display:none;">
-          <button class="remove" id="removeBtn">×</button>
-          <img id="imgPreview" alt="uploaded">
-        </div>
-
-        <label class="tile">
-          <div class="add">+</div>
-          <input id="fileInput" type="file" accept="image/*" hidden>
+        <label class="tile" for="photoInput" aria-label="Add photo">
+          <div class="plus">+</div>
         </label>
+        <input id="photoInput" type="file" accept="image/*" hidden />
       </div>
-
-      <div class="title-row">
-        <div class="title-label">Title your review <span style="font-weight:600;color:#555;">(required)</span></div>
-        <input id="reviewTitle" type="text" value="Dimmable LED Strip Lights for Bedroom – Sir">
-      </div>
-
-      <div class="spacer"></div>
     </div>
 
-    <div class="bottom">
-      <button class="submit" id="submitBtn">Submit</button>
-      <div class="smallhint">এটা ডেমো। Submit চাপলে এখন শুধু অ্যালার্ট দেখাবে।</div>
+    <h2 class="section">Title your review <span class="required">(required)</span></h2>
+    <div class="block">
+      <div class="spacer-sm"></div>
+      <input id="reviewTitle" type="text" value="Dimmable LED Strip Lights for Bedroom – Sir" />
     </div>
+  </main>
+
+  <div class="submit-bar">
+    <button class="submit" id="submitBtn" type="button">Submit</button>
   </div>
 
-<script>
-  // Stars
-  let rating = 0;
-  const stars = [...document.querySelectorAll(".star")];
-  function paintStars(){
-    stars.forEach(s=>{
-      const v = Number(s.dataset.star);
-      s.classList.toggle("off", v>rating);
+  <script>
+    // Default: 5 stars filled like screenshot
+    let rating = 5;
+    const starBtns = Array.from(document.querySelectorAll(".star-btn"));
+
+    function paintStars() {
+      starBtns.forEach(btn => {
+        const v = Number(btn.dataset.star);
+        btn.classList.toggle("off", v > rating);
+      });
+    }
+    starBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        rating = Number(btn.dataset.star);
+        paintStars();
+      });
     });
-  }
-  stars.forEach(s=>{
-    s.addEventListener("click", ()=>{
-      rating = Number(s.dataset.star);
-      paintStars();
+    paintStars();
+
+    // Photo add/remove
+    const photoInput = document.getElementById("photoInput");
+    const photoTile = document.getElementById("photoTile");
+    const photoPreview = document.getElementById("photoPreview");
+    const removeBtn = document.getElementById("removeBtn");
+
+    photoInput.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      photoPreview.src = URL.createObjectURL(f);
+      photoTile.style.display = "flex";
+      photoInput.value = "";
     });
-  });
-  paintStars();
 
-  // Photo upload (one photo like screenshot)
-  const fileInput = document.getElementById("fileInput");
-  const firstTile = document.getElementById("firstTile");
-  const imgPreview = document.getElementById("imgPreview");
-  const removeBtn = document.getElementById("removeBtn");
+    removeBtn.addEventListener("click", () => {
+      photoTile.style.display = "none";
+      photoPreview.src = "";
+    });
 
-  fileInput.addEventListener("change", (e)=>{
-    const f = e.target.files?.[0];
-    if(!f) return;
-    const url = URL.createObjectURL(f);
-    imgPreview.src = url;
-    firstTile.style.display = "block";
-    fileInput.value = "";
-  });
+    // Submit demo
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const title = document.getElementById("reviewTitle").value.trim();
+      const text  = document.getElementById("reviewText").value.trim();
 
-  removeBtn.addEventListener("click", ()=>{
-    imgPreview.src = "";
-    firstTile.style.display = "none";
-  });
+      if (!title) return alert("Title is required.");
+      if (rating === 0) return alert("Please select a star rating.");
 
-  // Submit demo
-  document.getElementById("submitBtn").addEventListener("click", ()=>{
-    const title = document.getElementById("reviewTitle").value.trim();
-    const text  = document.getElementById("reviewText").value.trim();
-
-    if(!title){ alert("Title দিতে হবে!"); return; }
-    if(rating===0){ alert("Star rating নির্বাচন করুন!"); return; }
-
-    alert("Submitted (demo)\n\nRating: "+rating+"/5\nTitle: "+title+"\nText length: "+text.length);
-  });
-</script>
+      alert("Submitted (demo)\\n\\nRating: " + rating + "/5\\nTitle: " + title + "\\nText length: " + text.length);
+    });
+  </script>
 </body>
 </html>
