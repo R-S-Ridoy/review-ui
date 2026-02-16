@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Review Page</title>
+  <style>
+    :root{
+      --bg:#f3d7a5;
+      --card:#ffffff;
+      --text:#111;
+      --muted:#6b6b6b;
+      --line:#e9e9e9;
+      --yellow:#f7c600;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:var(--bg);display:flex;justify-content:center;padding:14px}
+    .phone{
+      width:min(420px, 100%);
+      background:var(--card);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 10px 28px rgba(0,0,0,.12);
+      border:1px solid rgba(0,0,0,.06);
+    }
+
+    /* Top search bar */
+    .top{
+      background:transparent;
+      padding:14px 12px 10px;
+    }
+    .search{
+      display:flex;align-items:center;gap:10px;
+      background:#fff;
+      border-radius:28px;
+      border:1px solid var(--line);
+      padding:10px 12px;
+    }
+    .icon{font-size:18px;opacity:.8}
+    .pill{flex:1;color:#888;font-size:15px}
+    .mini{display:flex;gap:10px}
+
+    .content{padding:14px 14px 18px}
+
+    /* Header row */
+    .row{display:flex;gap:12px;align-items:flex-start}
+    .thumb{
+      width:52px;height:52px;border-radius:10px;border:1px solid var(--line);
+      background:linear-gradient(135deg,#ddd,#f7f7f7);
+      overflow:hidden;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px
+    }
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0;font-size:22px}
+    .subtitle{margin-top:4px;color:#444;font-size:15px}
+
+    /* Stars */
+    .stars{display:flex;gap:6px;margin:12px 0 14px}
+    .star{
+      width:44px;height:44px;border:none;background:transparent;cursor:pointer;
+      font-size:40px;line-height:1;color:#f0b400; /* default star color */
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,.05));
+      padding:0;
+    }
+    .star.off{color:#ffd88a}
+
+    .section{font-weight:800;margin:10px 0 8px;font-size:18px}
+
+    textarea{
+      width:100%;
+      border:1px solid #cfcfcf;
+      border-radius:14px;
+      padding:14px;
+      font-size:16px;
+      min-height:150px;
+      outline:none;
+    }
+
+    .photo-title{font-weight:800;margin:16px 0 10px;font-size:18px}
+    .photos{display:flex;gap:12px;align-items:center}
+    .tile{
+      width:88px;height:88px;border-radius:14px;border:1px solid #d7d7d7;background:#fff;
+      display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
+    }
+    .tile img{width:100%;height:100%;object-fit:cover}
+    .remove{
+      position:absolute;top:6px;left:6px;
+      width:26px;height:26px;border-radius:999px;border:none;
+      background:rgba(255,255,255,.9);
+      font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
+    }
+    .add{
+      font-size:42px;color:#777;cursor:pointer;user-select:none;
+      display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+    }
+
+    .title-row{margin-top:18px}
+    .title-label{font-weight:800;margin-bottom:8px;font-size:18px}
+    input[type="text"]{
+      width:100%;
+      border:1px solid #cfcfcf;
+      border-radius:14px;
+      padding:14px;
+      font-size:16px;
+      outline:none;
+    }
+
+    .bottom{
+      padding:14px;
+      background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+    }
+    .submit{
+      width:100%;
+      background:var(--yellow);
+      border:none;
+      font-weight:800;
+      font-size:18px;
+      padding:14px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,.12);
+    }
+    .submit:active{transform:scale(.99)}
+    .smallhint{color:var(--muted);font-size:12px;margin-top:8px}
+
+    /* Make it feel like full screen */
+    .spacer{height:8px}
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="top">
+      <div class="search">
+        <div class="icon">←</div>
+        <div class="pill">Search or ask a question</div>
+        <div class="mini">
+          <div class="icon">📷</div>
+          <div class="icon">🎤</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="row">
+        <div class="thumb" id="productThumb">
+          <img alt="product" src="https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=200&q=60">
+        </div>
+        <div>
+          <h1>How was the item?</h1>
+          <div class="subtitle">Led Strip Lights for Bedroom Dimmable 20 F…</div>
+        </div>
+      </div>
+
+      <div class="stars" aria-label="Star rating">
+        <button class="star off" data-star="1">★</button>
+        <button class="star off" data-star="2">★</button>
+        <button class="star off" data-star="3">★</button>
+        <button class="star off" data-star="4">★</button>
+        <button class="star off" data-star="5">★</button>
+      </div>
+
+      <div class="section">Write a review</div>
+      <textarea id="reviewText">I like these LED strips for my bedroom because they provide consistent, warm white light, but just a heads up — you can’t change the color. The remote works well to dim or brighten the lights, and the adhesive sticks nicely. They create a cozy atmosphere…</textarea>
+
+      <div class="photo-title">Share a video or photo</div>
+      <div class="photos" id="photos">
+        <div class="tile" id="firstTile" style="display:none;">
+          <button class="remove" id="removeBtn">×</button>
+          <img id="imgPreview" alt="uploaded">
+        </div>
+
+        <label class="tile">
+          <div class="add">+</div>
+          <input id="fileInput" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+
+      <div class="title-row">
+        <div class="title-label">Title your review <span style="font-weight:600;color:#555;">(required)</span></div>
+        <input id="reviewTitle" type="text" value="Dimmable LED Strip Lights for Bedroom – Sir">
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+
+    <div class="bottom">
+      <button class="submit" id="submitBtn">Submit</button>
+      <div class="smallhint">এটা ডেমো। Submit চাপলে এখন শুধু অ্যালার্ট দেখাবে।</div>
+    </div>
+  </div>
+
+<script>
+  // Stars
+  let rating = 0;
+  const stars = [...document.querySelectorAll(".star")];
+  function paintStars(){
+    stars.forEach(s=>{
+      const v = Number(s.dataset.star);
+      s.classList.toggle("off", v>rating);
+    });
+  }
+  stars.forEach(s=>{
+    s.addEventListener("click", ()=>{
+      rating = Number(s.dataset.star);
+      paintStars();
+    });
+  });
+  paintStars();
+
+  // Photo upload (one photo like screenshot)
+  const fileInput = document.getElementById("fileInput");
+  const firstTile = document.getElementById("firstTile");
+  const imgPreview = document.getElementById("imgPreview");
+  const removeBtn = document.getElementById("removeBtn");
+
+  fileInput.addEventListener("change", (e)=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    const url = URL.createObjectURL(f);
+    imgPreview.src = url;
+    firstTile.style.display = "block";
+    fileInput.value = "";
+  });
+
+  removeBtn.addEventListener("click", ()=>{
+    imgPreview.src = "";
+    firstTile.style.display = "none";
+  });
+
+  // Submit demo
+  document.getElementById("submitBtn").addEventListener("click", ()=>{
+    const title = document.getElementById("reviewTitle").value.trim();
+    const text  = document.getElementById("reviewText").value.trim();
+
+    if(!title){ alert("Title দিতে হবে!"); return; }
+    if(rating===0){ alert("Star rating নির্বাচন করুন!"); return; }
+
+    alert("Submitted (demo)\n\nRating: "+rating+"/5\nTitle: "+title+"\nText length: "+text.length);
+  });
+</script>
+</body>
+</html>
