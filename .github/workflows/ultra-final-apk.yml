@@ -10,7 +10,7 @@ on:
       package_name:
         description: "Package Name (যেমন: com.rs.review)"
         required: true
-        default: "com.example.ordertracking"
+        default: "com.example.review"
 
 jobs:
   build:
