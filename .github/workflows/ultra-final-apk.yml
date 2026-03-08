@@ -6,9 +6,9 @@ on:
       app_name:
         description: "App Name (যেমন: Order Tracking Pro)"
         required: true
-        default: "Order Tracking Pro"
+        default: "RS Review"
       package_name:
-        description: "Package Name (যেমন: com.yourname.ordertracking)"
+        description: "Package Name (যেমন: com.rs.review)"
         required: true
         default: "com.example.ordertracking"
 
