@@ -1,0 +1,181 @@
+name: ULTRA FINAL APK (Offline + Auto Icon + Android 11+)
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: "App Name (যেমন: Order Tracking Pro)"
+        required: true
+        default: "Order Tracking Pro"
+      package_name:
+        description: "Package Name (যেমন: com.yourname.ordertracking)"
+        required: true
+        default: "com.example.ordertracking"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Validate inputs + prepare www
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          PKG="${{ inputs.package_name }}"
+          if ! echo "$PKG" | grep -Eq '^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$'; then
+            echo "❌ Invalid package_name: $PKG"
+            echo "✅ Example: com.rsf.ordertracking (সব ছোট হাতের, ডট দিয়ে ভাগ)"
+            exit 1
+          fi
+
+          if [ ! -f index.html ]; then
+            echo "❌ index.html not found in repo root."
+            exit 1
+          fi
+
+          rm -rf www
+          mkdir -p www/vendor
+          cp index.html www/index.html
+
+          for d in assets asset images image img css js fonts static public; do
+            if [ -d "$d" ]; then
+              echo "✅ Copy folder: $d"
+              cp -r "$d" "www/"
+            fi
+          done
+
+      - name: OFFLINE bundle (stable + safe) + patch HTML
+        shell: bash
+        run: |
+          set -e
+          npm init -y >/dev/null 2>&1 || true
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+
+          npm i -D tailwindcss@3.4.10 @fortawesome/fontawesome-free@6.5.2 >/dev/null 2>&1 || true
+
+          printf '%s\n' '@tailwind base;' '@tailwind components;' '@tailwind utilities;' > tw-input.css
+          npx tailwindcss -i tw-input.css -o www/vendor/tailwind.css --minify --content www/index.html || true
+
+          mkdir -p www/vendor/fontawesome
+          cp -r node_modules/@fortawesome/fontawesome-free/css www/vendor/fontawesome/css 2>/dev/null || true
+          cp -r node_modules/@fortawesome/fontawesome-free/webfonts www/vendor/fontawesome/webfonts 2>/dev/null || true
+
+          curl -L --fail --retry 5 --retry-delay 2 -o www/vendor/html2pdf.bundle.min.js https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js || true
+
+          perl -0777 -i -pe 's#\s*<script[^>]*src="https://cdn\.tailwindcss\.com"[^>]*></script>\s*#\n#gmi' www/index.html
+          perl -0777 -i -pe 's#(<head[^>]*>)#$1\n    <link rel="stylesheet" href="vendor/tailwind.css">#i unless /vendor\/tailwind\.css/' www/index.html
+          perl -0777 -i -pe 's#<link[^>]*href="https://cdnjs\.cloudflare\.com/ajax/libs/font-awesome/[^"]+/css/all\.min\.css"[^>]*>#<link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">#gi' www/index.html
+          perl -0777 -i -pe 's#<script[^>]*src="https://cdnjs\.cloudflare\.com/ajax/libs/html2pdf\.js/[^"]+/html2pdf\.bundle\.min\.js"[^>]*></script>#<script src="vendor/html2pdf.bundle.min.js"></script>#gi' www/index.html
+
+      - name: Ensure icon.png exists (auto RS fallback)
+        shell: bash
+        run: |
+          set -e
+          if [ -f icon.png ]; then
+            echo "✅ Using your icon.png"
+            exit 0
+          fi
+          echo "ℹ️ icon.png not found. Generating RS icon..."
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw, ImageFont
+          import os
+          size = 1024
+          bg = (16, 124, 65, 255)
+          img = Image.new("RGBA", (size, size), bg)
+          draw = ImageDraw.Draw(img)
+          font = None
+          for path in [
+              "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+              "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+              "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+          ]:
+              if os.path.exists(path):
+                  font = ImageFont.truetype(path, 360)
+                  break
+          if font is None:
+              font = ImageFont.load_default()
+          text = "RS"
+          bbox = draw.textbbox((0,0), text, font=font)
+          tw, th = bbox[2]-bbox[0], bbox[3]-bbox[1]
+          x = (size - tw)//2
+          y = (size - th)//2 - 30
+          draw.text((x+10, y+10), text, font=font, fill=(0,0,0,70))
+          draw.text((x, y), text, font=font, fill=(255,255,255,255))
+          r = 70
+          cx, cy = size-150, 150
+          draw.ellipse((cx-r, cy-r, cx+r, cy+r), outline=(255,255,255,210), width=18)
+          img.save("icon.png", "PNG")
+          print("✅ Generated icon.png")
+          PY
+
+      - name: Install Capacitor (locked)
+        shell: bash
+        run: |
+          set -e
+          npm i @capacitor/core@6 @capacitor/android@6
+          npm i -D @capacitor/cli@6
+
+      - name: Init Capacitor App
+        shell: bash
+        run: |
+          set -e
+          npx cap init "${{ inputs.app_name }}" "${{ inputs.package_name }}" --web-dir www
+
+      - name: Add Android & Sync
+        shell: bash
+        run: |
+          set -e
+          npx cap add android
+          npx cap sync android
+
+      - name: Android 11+ only (minSdk 30)
+        shell: bash
+        run: |
+          set -e
+          FILE="android/variables.gradle"
+          if [ -f "$FILE" ]; then
+            sed -i 's/minSdkVersion = .*/minSdkVersion = 30/' "$FILE" || true
+          fi
+
+      - name: Apply App Icon (never fail build)
+        shell: bash
+        run: |
+          set +e
+          npm i -D @capacitor/assets@3
+          rm -rf assets
+          mkdir -p assets
+          cp icon.png assets/icon.png
+          npx capacitor-assets generate --android
+          exit 0
+
+      - name: Build Debug APK
+        working-directory: android
+        shell: bash
+        run: |
+          set -e
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: APK-${{ inputs.app_name }}-run${{ github.run_number }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
